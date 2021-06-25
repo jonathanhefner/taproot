@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Integration Test</title>
+
+  <script type="module">
+    import * as Taproot from "/src/index.js"
+
+    class IntegrationTestController extends Taproot.Controller {
+      static defaults = {
+        connectedCount: 0,
+        disconnectedCount: 0,
+        greeting: "Hello, World!",
+      }
+
+      connect() {
+        this.data.connectedCount += 1
+      }
+
+      disconnect() {
+        this.data.disconnectedCount += 1
+      }
+
+      setGreeting({ target }) {
+        this.data.greeting = this.dataFor(target).greeting
+      }
+
+      upcaseGreeting() {
+        this.data.greeting = this.data.greeting.toUpperCase()
+      }
+
+      stop(event) {
+        event.stopImmediatePropagation()
+      }
+
+      oops() {
+        this.data.greeting = "oops"
+        throw "error"
+      }
+
+      greetingChanged({ greeting }) {
+        for (const node of this.nodeSets.greetable) {
+          node.innerText = greeting
+        }
+
+        const { greetingsLedger } = this.nodes
+        if (greetingsLedger) {
+          this.dataFor(greetingsLedger, { greetingsCount: 0 }).greetingsCount += 1
+        }
+      }
+    }
+
+    Taproot.register(IntegrationTestController)
+    window.Taproot = Taproot
+    window.IntegrationTestController = IntegrationTestController
+  </script>
+
+</head>
+<body>
+</body>
+</html>
